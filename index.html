@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucky Bean - Winllen Coffee</title>
+<style>
+  :root{
+    --coffee-950:#2A1A10;
+    --coffee-800:#4A2E1C;
+    --coffee-600:#6B4226;
+    --gold-500:#C99A3B;
+    --gold-300:#E8C878;
+    --paper:#F4E9D6;
+    --cream:#FBF3E4;
+    --ink:#2A1A10;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(201,154,59,0.15), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(201,154,59,0.10), transparent 45%),
+      var(--coffee-950);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+  }
+  .card{
+    width:100%;
+    max-width:420px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    font-size:11px;
+    color: var(--gold-300);
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:28px;
+    margin:0 0 6px;
+    font-weight:700;
+    line-height:1.15;
+  }
+  .sub{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:14px;
+    color: rgba(244,233,214,0.7);
+    margin-bottom:32px;
+  }
+
+  .stage{
+    position:relative;
+    width:180px;
+    height:180px;
+    margin:0 auto 28px;
+  }
+  .bean-btn{
+    all:unset;
+    cursor:pointer;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .bean-btn:focus-visible svg{
+    outline: 2px solid var(--gold-300);
+    outline-offset: 6px;
+    border-radius: 50%;
+  }
+  svg{ display:block; }
+
+  .bean-shell{
+    transform-origin:center;
+    transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .stage.cracked .bean-shell.left{ transform: translate(-14px,-4px) rotate(-18deg); opacity:0; }
+  .stage.cracked .bean-shell.right{ transform: translate(14px,4px) rotate(18deg); opacity:0; }
+  .bean-shell{ transition: transform .6s ease, opacity .6s ease; }
+
+  .glow{
+    opacity:0;
+    transform:scale(0.6);
+    transition: opacity .5s ease .15s, transform .6s cubic-bezier(.34,1.56,.64,1) .15s;
+  }
+  .stage.cracked .glow{ opacity:1; transform:scale(1); }
+
+  .hint{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:12px;
+    color: rgba(244,233,214,0.55);
+    margin-top: -16px;
+    margin-bottom: 28px;
+  }
+
+  .result{
+    display:none;
+  }
+  .result.show{ display:block; animation: rise .5s ease; }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .prize-label{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:12px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color: var(--gold-300);
+    margin-bottom:8px;
+  }
+  .prize-name{
+    font-size:24px;
+    font-weight:700;
+    margin:0 0 18px;
+    color: var(--cream);
+  }
+  .code-box{
+    background: rgba(244,233,214,0.06);
+    border:1px dashed rgba(201,154,59,0.5);
+    border-radius:10px;
+    padding:14px 16px;
+    font-family: 'Courier New', monospace;
+    font-size:20px;
+    letter-spacing:0.15em;
+    color: var(--gold-300);
+    margin-bottom:20px;
+  }
+  .note{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:13px;
+    color: rgba(244,233,214,0.65);
+    line-height:1.5;
+  }
+
+  .again{
+    margin-top:22px;
+    background:none;
+    border:1px solid rgba(244,233,214,0.3);
+    color: rgba(244,233,214,0.8);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:12px;
+    padding:8px 16px;
+    border-radius:999px;
+    cursor:pointer;
+    display:none;
+  }
+  .footer{
+    margin-top:36px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:11px;
+    color: rgba(244,233,214,0.35);
+    letter-spacing:0.05em;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="eyebrow">Winllen Coffee &times; Cà Phê Vàng A Vàng</div>
+    <h1 id="title">Rút một hạt may mắn</h1>
+    <p class="sub" id="subtitle">Chạm vào hạt cà phê để mở quà</p>
+
+    <div class="stage" id="stage">
+      <button class="bean-btn" id="beanBtn" aria-label="Chạm để bóc hạt cà phê may mắn">
+        <svg viewBox="0 0 180 180" width="180" height="180">
+          <circle class="glow" cx="90" cy="90" r="70" fill="none" stroke="#C99A3B" stroke-width="2" opacity="0.5"/>
+          <g class="bean-shell left">
+            <path d="M90 30 C55 30 40 60 40 90 C40 120 55 150 90 150 C90 150 78 120 78 90 C78 60 90 30 90 30 Z"
+                  fill="#6B4226" stroke="#2A1A10" stroke-width="2"/>
+          </g>
+          <g class="bean-shell right">
+            <path d="M90 30 C125 30 140 60 140 90 C140 120 125 150 90 150 C90 150 102 120 102 90 C102 60 90 30 90 30 Z"
+                  fill="#4A2E1C" stroke="#2A1A10" stroke-width="2"/>
+          </g>
+          <path d="M90 34 C90 34 90 90 90 146" stroke="#2A1A10" stroke-width="3" fill="none" opacity="0.6"/>
+        </svg>
+      </button>
+    </div>
+    <p class="hint" id="hint">Chỉ dùng được 1 lần / lượt quét</p>
+
+    <div class="result" id="result">
+      <div class="prize-label">Bạn nhận được</div>
+      <div class="prize-name" id="prizeName">—</div>
+      <div class="code-box" id="prizeCode">—</div>
+      <p class="note">Đưa mã này cho nhân viên quầy để đổi quà. Mã chỉ dùng trong ngày hôm nay.</p>
+    </div>
+
+    <button class="again" id="againBtn">Đã đổi quà xong</button>
+    <div class="footer">WINLLEN COFFEE · THỊNH LIỆT, HOÀNG MAI</div>
+  </div>
+
+<script>
+  const prizes = [
+    { name: "Free Topping", weight: 30 },
+    { name: "Giảm 10.000đ ly sau", weight: 30 },
+    { name: "A Vàng size mini miễn phí", weight: 20 },
+    { name: "Giảm 20% hoá đơn", weight: 15 },
+    { name: "Voucher đồ uống bất kỳ", weight: 5 },
+  ];
+
+  function pickPrize(){
+    const total = prizes.reduce((s,p)=>s+p.weight,0);
+    let r = Math.random()*total;
+    for(const p of prizes){
+      if(r < p.weight) return p.name;
+      r -= p.weight;
+    }
+    return prizes[0].name;
+  }
+
+  function makeCode(){
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let out = "";
+    for(let i=0;i<5;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    return "AV-" + out;
+  }
+
+  const stage = document.getElementById('stage');
+  const beanBtn = document.getElementById('beanBtn');
+  const result = document.getElementById('result');
+  const prizeName = document.getElementById('prizeName');
+  const prizeCode = document.getElementById('prizeCode');
+  const title = document.getElementById('title');
+  const subtitle = document.getElementById('subtitle');
+  const hint = document.getElementById('hint');
+  const againBtn = document.getElementById('againBtn');
+
+  let opened = false;
+
+  function openBean(){
+    if(opened) return;
+    opened = true;
+    stage.classList.add('cracked');
+    const prize = pickPrize();
+    const code = makeCode();
+    setTimeout(()=>{
+      title.textContent = "Chúc mừng!";
+      subtitle.style.display = 'none';
+      hint.style.display = 'none';
+      prizeName.textContent = prize;
+      prizeCode.textContent = code;
+      result.classList.add('show');
+      againBtn.style.display = 'inline-block';
+    }, 550);
+  }
+
+  beanBtn.addEventListener('click', openBean);
+  beanBtn.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openBean(); }
+  });
+  againBtn.addEventListener('click', ()=>{ window.location.reload(); });
+</script>
+</body>
+</html>
